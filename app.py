@@ -63,15 +63,15 @@ def attraction():
 				connection = connection_pool.get_connection()
 				mycursor =  connection.cursor(dictionary=True)
 				mycursor.execute('SELECT `taipei-attractions`.`id`,`taipei-attractions`.`name`,`taipei-attractions`.`category`,`taipei-attractions`.`description`,`taipei-attractions`.`address`,`taipei-attractions`.`transport`, `taipei-attractions`.`MRT`,`taipei-attractions`.`latitude`,`taipei-attractions`.`longitude`,`img`.`images` FROM  `taipei-attractions` INNER JOIN `img` ON `taipei-attractions`.id = `img`.`taipei-att_id` WHERE  `category` = %s OR `name` LIKE %s group by `taipei-att_id` LIMIT %s OFFSET %s',(keyword,key,perpage_count,offset_count))
-				key_data=mycursor.fetchall()
-				
-				data_count=len(key_data)
+				data=mycursor.fetchall()
+				data_count=len(data)
+				json_data=json.dumps(data,indent=2,ensure_ascii = False)
+				json_data = json_data.replace('"http',' ["http').replace('jpg"',' jpg"]')
 				if data_count == perpage_count:
-					return jsonify(
-									{"nextPage":nextpage},
-									{"data":key_data})
-				return jsonify({"nextPage": "null"},
-									{"data":key_data})
+						alldata="'nextPage':{},'data':{}\n".format(nextpage,json_data)
+						return  alldata
+				
+				
 			finally:
 					mycursor.close()
 					connection.close()
@@ -81,15 +81,16 @@ def attraction():
 				connection = connection_pool.get_connection()
 				mycursor =  connection.cursor(dictionary=True)
 				mycursor.execute('SELECT `taipei-attractions`.`id`,`taipei-attractions`.`name`,`taipei-attractions`.`category`,`taipei-attractions`.`description`,`taipei-attractions`.`address`,`taipei-attractions`.`transport`, `taipei-attractions`.`MRT`,`taipei-attractions`.`latitude`,`taipei-attractions`.`longitude`,`img`.`images` FROM  `taipei-attractions` INNER JOIN `img` ON `taipei-attractions`.id = `img`.`taipei-att_id` group by `taipei-att_id` LIMIT %s OFFSET %s ',(perpage_count,offset_count))
-				datas=mycursor.fetchall()
-				data_count=len(datas)
+				data=mycursor.fetchall()
+				data_count=len(data)
+				json_data=json.dumps(data,indent=2,ensure_ascii = False)
+				json_data = json_data.replace('"http',' ["http').replace('jpg"',' jpg"]')
 				if data_count == perpage_count:
-						return jsonify(
-										{"nextPage":nextpage} ,
-										{"data":datas})
+						alldata="'nextPage':{},'data':{}\n".format(nextpage,json_data)
+						return  alldata
 				else:
-						return jsonify({"nextPage": "null"},
-											{"data":datas})
+						alldata="'nextPage':{},'data':{}\n".format(None,json_data)
+						return  alldata
 			finally:
 					mycursor.close()
 					connection.close()
@@ -106,28 +107,32 @@ def attraction_id(id): #http://127.0.0.1:3000/api/attractions/10
 			mycursor =  connection_object.cursor(dictionary=True)
 			mycursor.execute('SELECT `taipei-attractions`.`id`,`taipei-attractions`.`name`,`taipei-attractions`.`category`,`taipei-attractions`.`description`,`taipei-attractions`.`address`,`taipei-attractions`.`transport`, `taipei-attractions`.`MRT`,`taipei-attractions`.`latitude`,`taipei-attractions`.`longitude`,`img`.`images` FROM  `taipei-attractions` INNER JOIN `img` ON `taipei-attractions`.id = `img`.`taipei-att_id` WHERE `taipei-attractions`.`id` = %s group by `taipei-att_id`',(id,))
 			data=mycursor.fetchone()
+			json_data=json.dumps(data,indent=2,ensure_ascii = False)
+			json_data = json_data.replace('"http',' ["http').replace('jpg"',' jpg"]')
+			alldata="'data':{}\n".format(json_data)
 			if data:
-				return jsonify({"data":data})
-			return jsonify({"data":"null"})
+				return alldata
+			return	error_entry(400)
 		finally:
 				mycursor.close()
 				connection_object.close()
 	return render_template("attraction.html")
 
 
-@app.route("/api/categories",methods=["GET"])
-def categories(): #http://127.0.0.1:3000//api/categories?categories=
-	categories=request.args.get("categories")
+@app.route("/api/categories/<categories>",methods=["GET"])
+def categories(categories): #http://127.0.0.1:3000/api/categories/
 	if categories:
 		try:
 			connection_object = connection_pool.get_connection()
 			mycursor =  connection_object.cursor(dictionary=True)
 			mycursor.execute('SELECT `taipei-attractions`.`id`,`taipei-attractions`.`name`,`taipei-attractions`.`category`,`taipei-attractions`.`description`,`taipei-attractions`.`address`,`taipei-attractions`.`transport`, `taipei-attractions`.`MRT`,`taipei-attractions`.`latitude`,`taipei-attractions`.`longitude`,`img`.`images` FROM  `taipei-attractions` INNER JOIN `img` ON `taipei-attractions`.id = `img`.`taipei-att_id` WHERE  `taipei-attractions`.`category` = %s group by `taipei-att_id` ',(categories,))
 			data=mycursor.fetchall()
-			print(data)
+			json_data=json.dumps(data,indent=2,ensure_ascii = False)
+			json_data = json_data.replace('"http',' ["http').replace('jpg"',' jpg"]')
+			alldata="'data':{}\n".format(json_data)
 			if data:
-				return jsonify({"data":data})
-			return jsonify({"data":"null"})
+				return alldata
+			return server_error(500)
 		finally:
 				mycursor.close()
 				connection_object.close()
