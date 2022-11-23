@@ -12,7 +12,7 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 
 dbconfig={
     "user" : "root",
-    "password" : "",
+    "password" : "123456",
     "host" : "localhost",
     "database" : "taipei",
 }
@@ -95,7 +95,6 @@ def attraction():
 					mycursor.close()
 					connection.close()
 							
-	
 	return render_template("attraction.html")
 
 
@@ -119,24 +118,23 @@ def attraction_id(id): #http://127.0.0.1:3000/api/attractions/10
 	return render_template("attraction.html")
 
 
-@app.route("/api/categories/<categories>",methods=["GET"])
-def categories(categories): #http://127.0.0.1:3000/api/categories/
-	if categories:
+@app.route("/api/categories")
+def categories(): #http://127.0.0.1:3000/api/categories
 		try:
 			connection_object = connection_pool.get_connection()
-			mycursor =  connection_object.cursor(dictionary=True)
-			mycursor.execute('SELECT `taipei-attractions`.`id`,`taipei-attractions`.`name`,`taipei-attractions`.`category`,`taipei-attractions`.`description`,`taipei-attractions`.`address`,`taipei-attractions`.`transport`, `taipei-attractions`.`MRT`,`taipei-attractions`.`latitude`,`taipei-attractions`.`longitude`,`img`.`images` FROM  `taipei-attractions` INNER JOIN `img` ON `taipei-attractions`.id = `img`.`taipei-att_id` WHERE  `taipei-attractions`.`category` = %s group by `taipei-att_id` ',(categories,))
+			mycursor =  connection_object.cursor()
+			mycursor.execute('SELECT `category` FROM `taipei-attractions` group by `category`')
 			data=mycursor.fetchall()
 			json_data=json.dumps(data,indent=2,ensure_ascii = False)
-			json_data = json_data.replace('"http',' ["http').replace('jpg"',' jpg"]')
-			alldata="'data':{}\n".format(json_data)
+			print (json_data)
 			if data:
-				return alldata
+				catdata ="'data':{}\n".format(json_data)
+				return  jsonify({"data":data})
 			return server_error(500)
 		finally:
 				mycursor.close()
 				connection_object.close()
-	return render_template("attraction.html")
+		return render_template("attraction.html")
 
 # @app.route("/booking")
 # def booking():
