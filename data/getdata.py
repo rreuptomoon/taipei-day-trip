@@ -40,7 +40,6 @@ try:
         MRT=data.get("MRT")
         longitude=data.get("longitude")
         latitude=data.get("latitude") 
-        print(latitude)
         sql="INSERT INTO `taipei-attractions`(`id`,`name`,`Category`,`description`,`address`,`transport`,`MRT`,`longitude`,`latitude`)VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         val=(id,name,Category,description,address,transport,MRT,longitude,latitude)               
         mycursor.execute(sql,val)
@@ -52,7 +51,7 @@ finally:
 
 try:
     connection=connection_pool.get_connection()
-    mycursor=connection.cursor(dictionary=True)
+    mycursor=connection.cursor()
     for data in datas:
         taipei_att_id=data.get("_id")
         file=data.get("file")
@@ -62,15 +61,15 @@ try:
         images=[]
         for match in img:
             if "jpg" in match:
-                        images.append(match)
+                images.append(match)
         for image in images:
-        # images="\n".join(images)
-        # images=images.replace("https","'https").replace("jpg","jpg',\n")
-        # print(images)
-            sql="INSERT INTO `IMG`(`taipei-att_id`,`images`)VALUES(%s,%s)"
-            val=(taipei_att_id,image)               
-            mycursor.execute(sql,val)
-            connection.commit()
+            images="\n".join(images)
+            images=images.replace("https","'https").replace("jpg","jpg',\n")
+        print(image)
+    sql="INSERT INTO `img`(`taipei-att_id`,`images`)VALUES(%s,%s)"
+    val=(taipei_att_id,image)               
+    mycursor.execute(sql,val)
+    connection.commit()
 finally:
         mycursor.close()
         connection.close()
