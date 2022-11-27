@@ -176,10 +176,11 @@ def categories(): #http://127.0.0.1:3000/api/categories
 			mycursor =  connection_object.cursor()
 			mycursor.execute('SELECT `category` FROM `taipei-attractions` group by `category`')
 			datas=mycursor.fetchall()
-			for data in range(len(datas)):
-				print(data)
-			if data:
-				return  jsonify({"data":datas})
+			alldata=[]
+			for data in datas:
+				alldata.append(data[0])
+			if datas:
+				return  jsonify({"data":alldata})
 			return server_error(500)
 		finally:
 				mycursor.close()
