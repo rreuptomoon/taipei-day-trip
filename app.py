@@ -55,12 +55,9 @@ def attraction():
 	nextpage=page+startpage
 	perpage_count=12
 	offset_count=page*perpage_count
+	
 
-	if  keyword == "":	#http://127.0.0.1:3000/api/attractions?page=1&keyword=
-
-		return Not_Found(404)
-
-	if keyword :
+	if keyword :   #http://127.0.0.1:3000/api/attractions?page=1&keyword=
 				try:
 					key='%'+keyword+'%'
 					connection = connection_pool.get_connection()
