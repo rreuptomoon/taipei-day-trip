@@ -127,7 +127,7 @@ function getCat(categoryData) {
 
 
 SearchBar.addEventListener("click", function () {
-  Catlist.style.display = "block";
+  Catlist.classList.add("cat-grid-box");
   
 const catlistAllcat = document.querySelectorAll(".cat");
   for (let i = 0; i < catlistAllcat.length; i++){
@@ -136,14 +136,15 @@ const catlistAllcat = document.querySelectorAll(".cat");
       SearchBar.value = catlistAllcat[i].innerText;
 
       // console.log(SearchBar.value);
-      Catlist.style.display = "none"
     })
     
   }
   
 });
 
-
+window.addEventListener("mouseup" ,function() {
+  Catlist.classList.remove("cat-grid-box");
+})
 
 
 
